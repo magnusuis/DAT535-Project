@@ -43,23 +43,7 @@ python clean_data.py
 ```
 ---
 
-### **5. Add Raw Data to HDFS**
-Add the raw dataset to the `/data/raw` directory in HDFS using the following command:
-```bash
-hadoop fs -copyFromLocal /path/to/your/local/file.csv /data/raw/
-```
-
----
-
-### **6. Run Data Cleaning**
-Run the `clean_data.py` script to clean and preprocess the raw data:
-```bash
-python clean_data.py
-```
-
----
-
-## **7. Run Data Analytics**
+## **5. Run Data Analytics**
 Run the following scripts for data analysis:
 
 - To process contracts:
@@ -84,7 +68,7 @@ Run the following scripts for data analysis:
 
 ---
 
-## **8. Perform Clustering**
+## **6. Perform Clustering**
 Run the K-Means clustering script (also the other ones):
 ```bash
 python KMeanClustering.py
@@ -92,7 +76,7 @@ python KMeanClustering.py
 
 ---
 
-## **9. Calculate Risk Labels**
+## **7. Calculate Risk Labels**
 Run the `RiskCalculations.py` script to set up risk labels for the dataset:
 ```bash
 python RiskCalculations.py
@@ -100,7 +84,7 @@ python RiskCalculations.py
 
 ---
 
-## **10. Generate Risk Summary**
+## **8. Generate Risk Summary**
 Create a Parquet file summarizing the risk labels by running:
 ```bash
 python RiskSummary.py
