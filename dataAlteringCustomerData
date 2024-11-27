@@ -1,0 +1,134 @@
+import pandas as pd
+import numpy as np
+
+# Replace 'your_file.csv' with the path to your CSV file
+df = pd.read_csv('WA_Fn-UseC_-Telco-Customer-Churn.csv')
+
+# Make some values Null
+df.loc[100, "Dependents"] = np.nan  # Correct way to assign NaN
+df.loc[500, "Dependents"] = np.nan  # Assign NaN to another row (as an example)
+df.loc[1000, "Dependents"] = np.nan
+df.loc[2000, "Dependents"] = np.nan
+df.loc[5000, "Dependents"] = np.nan
+
+# Function to format the customerDescription
+def create_description(row):
+    description_parts = []
+
+    # Add gender (always included)
+    description_parts.append(f"{row['gender']}")
+    
+    # Add senior citizen if applicable
+    if row['SeniorCitizen'] == 1:
+        description_parts.append(f"senior")
+
+    # Add partner if applicable
+    if row['Partner'] == 'Yes':
+        description_parts.append(f"with partner")
+    
+    # Add dependents if applicable
+    if row['Dependents'] == 'Yes':
+        if 'with partner' in description_parts:
+            description_parts.append(f"and dependents")
+        else:
+            description_parts.append(f"with dependents")
+    elif pd.isna(row['Dependents']):
+        description_parts.append(f"and uncertain dependents")
+
+    # Combine the parts into a full description
+    return " ".join(description_parts)
+
+# Apply the function to create customerDescription
+df['customerDescription'] = df.apply(create_description, axis=1)
+
+# Keep only the required columns
+df_output = df[['customerID', 'customerDescription']]
+
+# Save to CSV
+df_output.to_csv('customersData.csv', index=False)
+
+def create_phone(row):
+    phones_parts = []
+
+    if row['PhoneService'] == "Yes":
+        phones_parts.append("Phone service")
+        if row['MultipleLines'] == "Yes":
+            phones_parts.append(" with multiple lines")
+    else :
+        phones_parts.append("None")
+
+    return "".join(phones_parts)
+
+def create_internet(row):
+    internet_parts = []
+
+    def add_array(text, array):
+        # Add text to services
+        if(len(array) == 1):
+            array.append(" with " + text)
+        else:
+            array.append(", " + text)
+    
+    # Add services
+    if row['InternetService'] != "No":
+        internet_parts.append(row['InternetService'])
+
+        # Add-ons
+        if row['OnlineSecurity'] == "Yes":
+            add_array(f"online security", internet_parts)
+        if row['OnlineBackup'] == "Yes":
+            add_array(f"online backup", internet_parts)
+        if row['DeviceProtection'] == "Yes":
+            add_array(f"device protection", internet_parts)
+        if row['TechSupport'] == "Yes":
+            add_array(f"tech support", internet_parts)
+        if row['StreamingTV'] == "Yes":
+            add_array(f"streaming tv", internet_parts)
+        if row['StreamingMovies'] == "Yes":
+            add_array(f"streaming movies", internet_parts)
+    else:
+        internet_parts.append("None")
+
+    # Combine the parts into a full description
+    return "".join(internet_parts)
+
+df['phoneDescription'] = df.apply(create_phone, axis=1)
+df['internetDescription'] = df.apply(create_internet, axis=1)
+
+df_output = df[['customerID', 'phoneDescription', 'internetDescription']]
+
+###df_output.to_csv('servicesData.csv', index=False)
+
+def create_subscription_status(row):
+    subscription_parts = []
+
+    # Churn status
+    if(row["Churn"] == "Yes"):
+        subscription_parts.append("Was subscribed for ")
+    else:
+        subscription_parts.append("Is subscribed for ")
+    
+    subscription_parts.append(str(row["tenure"]) + " months")
+
+    subscription_parts.append(" at a monthly cost of " + str(row["MonthlyCharges"]))
+
+    return "".join(subscription_parts)
+
+def create_contract(row):
+    contract_parts = []
+
+    contract_parts.append(row["Contract"])
+
+    contract_parts.append(row["PaymentMethod"])
+
+    if(row["PaperlessBilling"] == "Yes"):
+        contract_parts.append("paperless billing")
+
+    return " ".join(contract_parts)
+
+df['subscriptionDescription'] = df.apply(create_subscription_status, axis=1)
+df['contractDescription'] = df.apply(create_contract, axis=1)
+
+df_output = df[['customerID', 'subscriptionDescription', 'contractDescription', 'TotalCharges']]
+
+df_output.to_csv('contractData.csv', index=False)
